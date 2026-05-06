@@ -13,9 +13,5 @@ tmp/
 .env.*
 !.env.example
 
-# OpenCode local plugin install cache
-.opencode/node_modules/
-.opencode/package.json
-.opencode/package-lock.json
-.opencode/bun.lock
-.opencode/.gitignore
+# OpenCode auto-generated directory
+.opencode/
