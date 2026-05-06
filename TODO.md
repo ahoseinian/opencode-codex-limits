@@ -48,9 +48,9 @@ Build a lightweight OpenCode plugin that shows Codex usage limits in the OpenCod
 - [x] Render secondary/weekly quota usage in the sidebar.
 - [x] Add compact progress bars and status labels.
 - [x] Add reset-time formatting.
-- [ ] Add manual refresh support.
-- [ ] Add background refresh with a conservative default interval.
-- [ ] Show stale data clearly if refresh fails after a previous success.
+- [x] Add manual refresh support.
+- [x] Add background refresh with a conservative default interval.
+- [x] Show stale data clearly if refresh fails after a previous success.
 - [x] Add tests for successful usage parsing.
 - [x] Add tests for missing auth and expired auth cases.
 - [ ] Add tests for network and unexpected-response failures.

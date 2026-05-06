@@ -1,11 +1,12 @@
 /** @jsxImportSource @opentui/solid */
 import type { TuiPlugin, TuiPluginModule } from "@opencode-ai/plugin/tui";
-import { createResource, For, Show } from "solid-js";
+import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { readAuth } from "./src/auth";
 import { fetchUsage } from "./src/usage";
 import type { QuotaState, QuotaWindow } from "./src/types";
 
 const id = "opencode-codex-limits";
+const REFRESH_MS = 60_000;
 
 function remaining(w: QuotaWindow) {
   return Math.max(0, 100 - w.usedPercent);
@@ -62,29 +63,55 @@ async function loadQuota(): Promise<QuotaState> {
 }
 
 function CodexLimitsPanel(props: { theme: () => any }) {
-  const [quota, { refetch: _refetch }] = createResource(loadQuota);
+  const [quota, setQuota] = createSignal<QuotaState>({ tag: "loading" });
+  const [stale, setStale] = createSignal(false);
+  let interval: ReturnType<typeof setInterval> | null = null;
+
+  const refresh = async () => {
+    const result = await loadQuota();
+    if (result.tag === "error") {
+      const current = quota();
+      if (current.tag === "data") {
+        setStale(true);
+        return;
+      }
+    } else {
+      setStale(false);
+    }
+    setQuota(result);
+  };
+
+  onMount(() => {
+    refresh();
+    interval = setInterval(refresh, REFRESH_MS);
+  });
+
+  onCleanup(() => {
+    if (interval) clearInterval(interval);
+  });
 
   return (
-    <box flexDirection="column">
-      <text>
-        <b>Codex Limits</b>
-      </text>
+    <box flexDirection="column" gap={1}>
+      <box flexDirection="row">
+        <text>
+          <b>Codex Limits</b>
+        </text>
+        <Show when={stale()}>
+          <text fg={props.theme().textMuted}> (stale)</text>
+        </Show>
+      </box>
 
-      <Show when={quota.loading}>
+      <Show when={quota().tag === "loading"}>
         <text fg={props.theme().textMuted}>loading...</text>
       </Show>
 
-      <Show when={quota.error}>
-        <text fg={props.theme().textMuted}>loading...</text>
-      </Show>
-
-      <Show when={quota()?.tag === "error"}>
+      <Show when={quota().tag === "error"}>
         <text fg={props.theme().error}>
           {(quota() as { tag: "error"; message: string }).message}
         </text>
       </Show>
 
-      <Show when={quota()?.tag === "data"}>
+      <Show when={quota().tag === "data"}>
         <For each={(quota() as { tag: "data"; windows: QuotaWindow[] }).windows}>
           {(window) => {
             const remaining_percent = remaining(window);
@@ -92,13 +119,28 @@ function CodexLimitsPanel(props: { theme: () => any }) {
 
             return (
               <text fg={props.theme().text}>
-                {remaining_text} {progressBar(remaining_percent)} {window.label} {"\u21bb"}{" "}
-                {window.resetText}
+                {remaining_text} {progressBar(remaining_percent)} {window.label.padEnd(6, " ")}{" "}
+                {"\u21bb"} {window.resetText}
               </text>
             );
           }}
         </For>
       </Show>
+
+      <box
+        focusable
+        onMouseDown={() => {
+          void refresh();
+        }}
+        onKeyDown={(event) => {
+          if (event.name === "return" || event.name === "space") {
+            event.preventDefault();
+            void refresh();
+          }
+        }}
+      >
+        <text fg={props.theme().textMuted}>{"\u21bb"} refresh</text>
+      </box>
     </box>
   );
 }
