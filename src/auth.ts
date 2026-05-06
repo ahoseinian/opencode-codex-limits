@@ -62,21 +62,7 @@ type AuthEntry = {
 
 const PROVIDER_KEYS = ["codex", "openai", "chatgpt", "opencode"] as const;
 
-export function readAuth(): AuthResult {
-  const paths = authPaths();
-
-  let raw: string | null = null;
-  for (const p of paths) {
-    try {
-      raw = readFileSync(p, "utf8");
-      break;
-    } catch {
-      continue;
-    }
-  }
-
-  if (!raw) return { ok: false, error: "auth_file_missing" };
-
+export function parseAuthJson(raw: string): AuthResult {
   let data: Record<string, unknown>;
   try {
     data = JSON.parse(raw);
@@ -104,4 +90,22 @@ export function readAuth(): AuthResult {
   }
 
   return { ok: false, error: "no_openai_auth" };
+}
+
+export function readAuth(): AuthResult {
+  const paths = authPaths();
+
+  let raw: string | null = null;
+  for (const p of paths) {
+    try {
+      raw = readFileSync(p, "utf8");
+      break;
+    } catch {
+      continue;
+    }
+  }
+
+  if (!raw) return { ok: false, error: "auth_file_missing" };
+
+  return parseAuthJson(raw);
 }

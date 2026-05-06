@@ -12,10 +12,10 @@
     "build": "bun build ./tui.tsx --outdir ./dist --target bun --external @opencode-ai/plugin --external @opentui/solid --external solid-js",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
-    "lint": "oxlint tui.tsx src/",
-    "lint:fix": "oxlint --fix tui.tsx src/",
-    "format": "oxfmt package.json tsconfig.json .oxlintrc.json .oxfmtrc.json tui.tsx TODO.md \"src/**/*.ts\"",
-    "format:check": "oxfmt --check package.json tsconfig.json .oxlintrc.json .oxfmtrc.json tui.tsx TODO.md \"src/**/*.ts\""
+    "lint": "oxlint tui.tsx src/ tests/",
+    "lint:fix": "oxlint --fix tui.tsx src/ tests/",
+    "format": "oxfmt package.json tsconfig.json .oxlintrc.json .oxfmtrc.json tui.tsx TODO.md \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "format:check": "oxfmt --check package.json tsconfig.json .oxlintrc.json .oxfmtrc.json tui.tsx TODO.md \"src/**/*.ts\" \"tests/**/*.ts\""
   },
   "dependencies": {
     "@opencode-ai/plugin": "^1.2.27",

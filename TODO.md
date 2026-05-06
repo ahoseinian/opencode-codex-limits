@@ -52,7 +52,7 @@ Build a lightweight OpenCode plugin that shows Codex usage limits in the OpenCod
 - [ ] Add background refresh with a conservative default interval.
 - [ ] Show stale data clearly if refresh fails after a previous success.
 - [ ] Add tests for successful usage parsing.
-- [ ] Add tests for missing auth and expired auth cases.
+- [x] Add tests for missing auth and expired auth cases.
 - [ ] Add tests for network and unexpected-response failures.
 - [ ] Add installation instructions for local development.
 - [ ] Add final README documentation after the first working version.
