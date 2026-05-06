@@ -65,7 +65,7 @@ function CodexLimitsPanel(props: { theme: () => any }) {
   const [quota, { refetch: _refetch }] = createResource(loadQuota);
 
   return (
-    <box flexDirection="column" gap={1}>
+    <box flexDirection="column">
       <text>
         <b>Codex Limits</b>
       </text>
