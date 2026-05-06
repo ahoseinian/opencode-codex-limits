@@ -42,16 +42,16 @@ Build a lightweight OpenCode plugin that shows Codex usage limits in the OpenCod
 - [x] Add a minimal sidebar panel that renders static placeholder quota data.
 - [x] Locate and read existing Codex/OpenCode auth credentials from the local machine.
 - [x] Add clear error messages for missing or invalid auth.
-- [ ] Implement a Codex usage client that fetches the current quota snapshot.
-- [ ] Normalize API data into a small internal quota model.
-- [ ] Render primary/5-hour quota usage in the sidebar.
-- [ ] Render secondary/weekly quota usage in the sidebar.
-- [ ] Add compact progress bars and status labels.
-- [ ] Add reset-time formatting.
+- [x] Implement a Codex usage client that fetches the current quota snapshot.
+- [x] Normalize API data into a small internal quota model.
+- [x] Render primary/5-hour quota usage in the sidebar.
+- [x] Render secondary/weekly quota usage in the sidebar.
+- [x] Add compact progress bars and status labels.
+- [x] Add reset-time formatting.
 - [ ] Add manual refresh support.
 - [ ] Add background refresh with a conservative default interval.
 - [ ] Show stale data clearly if refresh fails after a previous success.
-- [ ] Add tests for successful usage parsing.
+- [x] Add tests for successful usage parsing.
 - [x] Add tests for missing auth and expired auth cases.
 - [ ] Add tests for network and unexpected-response failures.
 - [ ] Add installation instructions for local development.
