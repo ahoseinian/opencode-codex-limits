@@ -1,6 +1,6 @@
 /** @jsxImportSource @opentui/solid */
 import type { TuiPlugin, TuiPluginModule } from "@opencode-ai/plugin/tui";
-import { createResource, createSignal, For, onMount, Show } from "solid-js";
+import { createResource, For, Show } from "solid-js";
 import { readAuth } from "./src/auth";
 import { fetchUsage } from "./src/usage";
 import type { QuotaState, QuotaWindow } from "./src/types";
@@ -70,12 +70,6 @@ async function loadQuota(): Promise<QuotaState> {
 
 function CodexLimitsPanel(props: { theme: () => any }) {
   const [quota, { refetch: _refetch }] = createResource(loadQuota);
-  const [email, setEmail] = createSignal<string | null>(null);
-
-  onMount(() => {
-    const auth = readAuth();
-    if (auth.ok) setEmail(auth.email);
-  });
 
   const status = () => {
     const data = quota();
@@ -89,10 +83,6 @@ function CodexLimitsPanel(props: { theme: () => any }) {
       <text fg={statusColor()}>
         <b>Codex Limits [{status().label}]</b>
       </text>
-
-      <Show when={email()}>
-        <text fg={props.theme().textMuted}>{email()}</text>
-      </Show>
 
       <Show when={quota.loading}>
         <text fg={props.theme().textMuted}>loading...</text>
@@ -111,13 +101,10 @@ function CodexLimitsPanel(props: { theme: () => any }) {
       <Show when={quota()?.tag === "data"}>
         <For each={(quota() as { tag: "data"; windows: QuotaWindow[] }).windows}>
           {(window) => (
-            <box flexDirection="column" gap={0}>
-              <text fg={props.theme().text}>
-                {window.label.padEnd(6, " ")} {progressBar(remaining(window))} {remaining(window)}%
-                rem
-              </text>
-              <text fg={props.theme().textMuted}>resets in {window.resetText}</text>
-            </box>
+            <text fg={props.theme().text}>
+              {window.label.padEnd(6, " ")} {progressBar(remaining(window))} {remaining(window)}%
+              rem {"\u21bb"} {window.resetText}
+            </text>
           )}
         </For>
       </Show>
