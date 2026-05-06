@@ -6,7 +6,7 @@ import { fetchUsage } from "./src/usage";
 import type { QuotaState, QuotaWindow } from "./src/types";
 
 const id = "opencode-codex-limits";
-const REFRESH_MS = 60_000;
+const REFRESH_MS = 120_000; // 2 minutes
 
 function remaining(w: QuotaWindow) {
   return Math.max(0, 100 - w.usedPercent);
@@ -126,21 +126,6 @@ function CodexLimitsPanel(props: { theme: () => any }) {
           }}
         </For>
       </Show>
-
-      <box
-        focusable
-        onMouseDown={() => {
-          void refresh();
-        }}
-        onKeyDown={(event) => {
-          if (event.name === "return" || event.name === "space") {
-            event.preventDefault();
-            void refresh();
-          }
-        }}
-      >
-        <text fg={props.theme().textMuted}>{"\u21bb"} refresh</text>
-      </box>
     </box>
   );
 }
