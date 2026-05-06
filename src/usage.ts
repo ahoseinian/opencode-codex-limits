@@ -42,14 +42,8 @@ export function parseUsageResponse(data: unknown): UsageResult {
   }
 
   const windows = [
-    {
-      label: "5h",
-      window: data.rate_limit.primary_window,
-    },
-    {
-      label: "weekly",
-      window: data.rate_limit.secondary_window,
-    },
+    { label: "5h", window: data.rate_limit.primary_window },
+    { label: "weekly", window: data.rate_limit.secondary_window },
   ]
     .filter(({ window: w }) => w !== null && w !== undefined)
     .map(({ label, window: w }) => {
