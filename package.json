@@ -1,8 +1,17 @@
 {
   "name": "opencode-codex-limits",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "OpenCode plugin that shows ChatGPT/Codex usage quota in the sidebar",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ahoseinian/opencode-codex-limits.git"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "type": "module",
   "main": "./dist/tui.js",
   "exports": {
@@ -13,20 +22,15 @@
       "import": "./dist/tui.js"
     }
   },
-  "files": ["dist", "README.md", "LICENSE"],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ahoseinian/opencode-codex-limits.git"
-  },
   "scripts": {
-    "build": "bun build ./tui.tsx --outdir ./dist --target bun --external @opencode-ai/plugin --external @opentui/solid --external solid-js",
+    "build": "bun ./scripts/build.ts",
     "prepublishOnly": "bun run typecheck && bun run test && bun run lint && bun run build",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
-    "lint": "oxlint tui.tsx src/",
-    "lint:fix": "oxlint --fix tui.tsx src/",
-    "format": "oxfmt package.json tsconfig.json .oxlintrc.json .oxfmtrc.json tui.tsx TODO.md \"src/**/*.ts\"",
-    "format:check": "oxfmt --check package.json tsconfig.json .oxlintrc.json .oxfmtrc.json tui.tsx TODO.md \"src/**/*.ts\""
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check"
   },
   "dependencies": {
     "@opencode-ai/plugin": "^1.2.27",
