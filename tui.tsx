@@ -86,12 +86,17 @@ function CodexLimitsPanel(props: { theme: () => any }) {
 
       <Show when={quota()?.tag === "data"}>
         <For each={(quota() as { tag: "data"; windows: QuotaWindow[] }).windows}>
-          {(window) => (
-            <text fg={props.theme().text}>
-              {window.label} {progressBar(remaining(window))} {remaining(window)}% {"\u21bb"}{" "}
-              {window.resetText}
-            </text>
-          )}
+          {(window) => {
+            const remaining_percent = remaining(window);
+            const remaining_text = String(remaining_percent).padStart(3, " ") + "%";
+
+            return (
+              <text fg={props.theme().text}>
+                {remaining_text} {progressBar(remaining_percent)} {window.label} {"\u21bb"}{" "}
+                {window.resetText}
+              </text>
+            );
+          }}
         </For>
       </Show>
     </box>
