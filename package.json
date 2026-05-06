@@ -1,0 +1,31 @@
+{
+  "name": "opencode-codex-limits",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./tui": {
+      "import": "./tui.tsx"
+    }
+  },
+  "scripts": {
+    "build": "bun build ./tui.tsx --outdir ./dist --target bun --external @opencode-ai/plugin --external @opentui/solid --external solid-js",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "lint": "oxlint tui.tsx",
+    "lint:fix": "oxlint --fix tui.tsx",
+    "format": "oxfmt package.json tsconfig.json .oxlintrc.json .oxfmtrc.json tui.tsx TODO.md",
+    "format:check": "oxfmt --check package.json tsconfig.json .oxlintrc.json .oxfmtrc.json tui.tsx TODO.md"
+  },
+  "dependencies": {
+    "@opencode-ai/plugin": "^1.2.27",
+    "@opentui/solid": "^0.1.101",
+    "solid-js": "^1.9.10"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "oxfmt": "latest",
+    "oxlint": "latest",
+    "typescript": "latest"
+  }
+}

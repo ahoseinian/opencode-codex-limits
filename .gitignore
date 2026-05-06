@@ -1,0 +1,21 @@
+node_modules/
+dist/
+.DS_Store
+
+# Logs and runtime output
+*.log
+coverage/
+.tmp/
+tmp/
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# OpenCode local plugin install cache
+.opencode/node_modules/
+.opencode/package.json
+.opencode/package-lock.json
+.opencode/bun.lock
+.opencode/.gitignore
