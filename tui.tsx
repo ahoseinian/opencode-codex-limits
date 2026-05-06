@@ -1,14 +1,10 @@
 /** @jsxImportSource @opentui/solid */
 import type { TuiPlugin, TuiPluginModule } from "@opencode-ai/plugin/tui";
-import { For } from "solid-js";
+import { createSignal, For, onMount, Show } from "solid-js";
+import { readAuth } from "./src/auth";
+import type { QuotaWindow } from "./src/types";
 
 const id = "opencode-codex-limits";
-
-type QuotaWindow = {
-  label: string;
-  usedPercent: number;
-  resetText: string;
-};
 
 const placeholderWindows: QuotaWindow[] = [
   {
@@ -36,7 +32,39 @@ function progressBar(percent: number) {
   return `${"█".repeat(filled)}${"░".repeat(width - filled)}`;
 }
 
+function authErrorMessage(error: string): string {
+  switch (error) {
+    case "auth_file_missing":
+      return "No auth file found. Run 'opencode auth login' to connect.";
+    case "no_openai_auth":
+      return "No OpenAI auth found. Run 'opencode auth login' and select ChatGPT Plus/Pro.";
+    case "no_access_token":
+      return "OpenAI access token is missing. Re-authenticate with 'opencode auth login'.";
+    case "token_expired":
+      return "OpenAI token has expired. Re-authenticate to refresh.";
+    case "invalid_token":
+      return "Invalid OpenAI token. Re-authenticate to fix.";
+    default:
+      return error;
+  }
+}
+
 function CodexLimitsPanel(props: { theme: () => any }) {
+  const [authStatus, setAuthStatus] = createSignal<{
+    tag: "loading" | "connected" | "error";
+    email?: string;
+    error?: string;
+  }>({ tag: "loading" });
+
+  onMount(() => {
+    const result = readAuth();
+    if (result.ok) {
+      setAuthStatus({ tag: "connected", email: result.email });
+    } else {
+      setAuthStatus({ tag: "error", error: result.error });
+    }
+  });
+
   const status = () => statusFor(placeholderWindows);
   const statusColor = () => props.theme()[status().colorName];
 
@@ -45,6 +73,19 @@ function CodexLimitsPanel(props: { theme: () => any }) {
       <text fg={statusColor()}>
         <b>Codex Limits [{status().label}]</b>
       </text>
+
+      <Show when={authStatus().tag === "loading"}>
+        <text fg={props.theme().textMuted}>checking auth...</text>
+      </Show>
+
+      <Show when={authStatus().tag === "error"}>
+        <text fg={props.theme().error}>{authErrorMessage(authStatus().error!)}</text>
+      </Show>
+
+      <Show when={authStatus().tag === "connected"}>
+        <text fg={props.theme().textMuted}>{authStatus().email}</text>
+      </Show>
+
       <For each={placeholderWindows}>
         {(window) => (
           <box flexDirection="column" gap={0}>
@@ -55,7 +96,10 @@ function CodexLimitsPanel(props: { theme: () => any }) {
           </box>
         )}
       </For>
-      <text fg={props.theme().textMuted}>static placeholder data</text>
+
+      <Show when={authStatus().tag !== "connected"}>
+        <text fg={props.theme().textMuted}>quota unavailable until connected</text>
+      </Show>
     </box>
   );
 }
