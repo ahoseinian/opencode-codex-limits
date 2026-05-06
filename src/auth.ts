@@ -60,7 +60,7 @@ type AuthEntry = {
   expires?: number;
 };
 
-const PROVIDER_KEYS = ["codex", "openai", "chatgpt", "opencode"] as const;
+const PROVIDER_KEYS = ["openai"] as const;
 
 export function parseAuthJson(raw: string): AuthResult {
   let data: Record<string, unknown>;

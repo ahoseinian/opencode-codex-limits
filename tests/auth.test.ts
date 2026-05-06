@@ -26,18 +26,6 @@ describe("parseAuthJson", () => {
     }
   });
 
-  test("scans codex key before openai", () => {
-    const json = JSON.stringify({
-      codex: { type: "oauth", access: VALID_JWT },
-      openai: { type: "oauth", access: "different" },
-    });
-    const result = parseAuthJson(json);
-    expect(result.ok).toBe(true);
-    if (result.ok) {
-      expect(result.accountId).toBe("test-account-id");
-    }
-  });
-
   test("skips non-oauth type entries", () => {
     const json = JSON.stringify({
       openai: { type: "api_key", access: VALID_JWT },
@@ -95,9 +83,9 @@ describe("parseAuthJson", () => {
     if (!result.ok) expect(result.error).toBe("no_openai_auth");
   });
 
-  test("returns no_openai_auth for unknown provider keys", () => {
+  test("ignores non-openai keys in auth file", () => {
     const json = JSON.stringify({
-      unknown_provider: { type: "oauth", access: VALID_JWT },
+      codex: { type: "oauth", access: VALID_JWT },
     });
     const result = parseAuthJson(json);
     expect(result.ok).toBe(false);
