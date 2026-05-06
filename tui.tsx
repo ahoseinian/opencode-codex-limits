@@ -11,13 +11,6 @@ function remaining(w: QuotaWindow) {
   return Math.max(0, 100 - w.usedPercent);
 }
 
-function statusFor(windows: QuotaWindow[]) {
-  const lowestRemaining = Math.min(...windows.map(remaining));
-  if (lowestRemaining <= 5) return { label: "CRIT", colorName: "error" as const };
-  if (lowestRemaining <= 20) return { label: "WARN", colorName: "warning" as const };
-  return { label: "OK", colorName: "success" as const };
-}
-
 function progressBar(percent: number) {
   const width = 10;
   const filled = Math.max(0, Math.min(width, Math.round((percent / 100) * width)));
@@ -71,17 +64,10 @@ async function loadQuota(): Promise<QuotaState> {
 function CodexLimitsPanel(props: { theme: () => any }) {
   const [quota, { refetch: _refetch }] = createResource(loadQuota);
 
-  const status = () => {
-    const data = quota();
-    if (!data || data.tag !== "data") return { label: "--", colorName: "textMuted" as const };
-    return statusFor(data.windows);
-  };
-  const statusColor = () => props.theme()[status().colorName];
-
   return (
     <box flexDirection="column" gap={1}>
-      <text fg={statusColor()}>
-        <b>Codex Limits [{status().label}]</b>
+      <text>
+        <b>Codex Limits</b>
       </text>
 
       <Show when={quota.loading}>
