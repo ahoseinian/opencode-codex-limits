@@ -7,10 +7,14 @@ import type { QuotaState, QuotaWindow } from "./src/types";
 
 const id = "opencode-codex-limits";
 
+function remaining(w: QuotaWindow) {
+  return Math.max(0, 100 - w.usedPercent);
+}
+
 function statusFor(windows: QuotaWindow[]) {
-  const highestUsage = Math.max(...windows.map((w) => w.usedPercent));
-  if (highestUsage >= 95) return { label: "CRIT", colorName: "error" as const };
-  if (highestUsage >= 80) return { label: "WARN", colorName: "warning" as const };
+  const lowestRemaining = Math.min(...windows.map(remaining));
+  if (lowestRemaining <= 5) return { label: "CRIT", colorName: "error" as const };
+  if (lowestRemaining <= 20) return { label: "WARN", colorName: "warning" as const };
   return { label: "OK", colorName: "success" as const };
 }
 
@@ -109,8 +113,8 @@ function CodexLimitsPanel(props: { theme: () => any }) {
           {(window) => (
             <box flexDirection="column" gap={0}>
               <text fg={props.theme().text}>
-                {window.label.padEnd(6, " ")} {progressBar(window.usedPercent)} {window.usedPercent}
-                %
+                {window.label.padEnd(6, " ")} {progressBar(remaining(window))} {remaining(window)}%
+                rem
               </text>
               <text fg={props.theme().textMuted}>resets in {window.resetText}</text>
             </box>
