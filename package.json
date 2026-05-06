@@ -1,6 +1,6 @@
 {
   "name": "opencode-codex-limits",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "OpenCode plugin that shows ChatGPT/Codex usage quota in the sidebar",
   "license": "MIT",
   "repository": {
@@ -24,7 +24,7 @@
   },
   "scripts": {
     "build": "bun ./scripts/build.ts",
-    "prepublishOnly": "bun run typecheck && bun run test && bun run lint && bun run build",
+    "prepublishOnly": "bun run typecheck && bun run test && bun run lint && bun run format:check && bun run build",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
     "lint": "oxlint",
@@ -33,9 +33,9 @@
     "format:check": "oxfmt --check"
   },
   "dependencies": {
-    "@opencode-ai/plugin": "^1.2.27",
-    "@opentui/solid": "^0.1.101",
-    "solid-js": "^1.9.10"
+    "@opencode-ai/plugin": "^1.14.39",
+    "@opentui/solid": "^0.2.3",
+    "solid-js": "^1.9.12"
   },
   "devDependencies": {
     "@types/bun": "latest",

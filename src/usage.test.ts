@@ -1,5 +1,5 @@
-import { describe, expect, test } from "bun:test";
-import { parseUsageResponse } from "./usage";
+import { afterEach, describe, expect, mock, test } from "bun:test";
+import { fetchUsage, parseUsageResponse } from "./usage";
 
 function validResponse() {
   return {
@@ -30,6 +30,12 @@ function validResponse() {
     },
     spend_control: { reached: false },
   };
+}
+
+function mockFetch(handler: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>) {
+  const fetchMock = mock(handler);
+  globalThis.fetch = fetchMock as unknown as typeof fetch;
+  return fetchMock;
 }
 
 describe("parseUsageResponse", () => {
@@ -103,5 +109,75 @@ describe("parseUsageResponse", () => {
     const result = parseUsageResponse(null);
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error).toBe("invalid_response");
+  });
+});
+
+describe("fetchUsage", () => {
+  afterEach(() => {
+    mock.restore();
+  });
+
+  test("sends auth and account headers", async () => {
+    const fetchMock = mockFetch(async () => Response.json(validResponse()));
+
+    const result = await fetchUsage("token-123", "account-456");
+
+    expect(result.ok).toBe(true);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe("https://chatgpt.com/backend-api/wham/usage");
+    expect(init?.method).toBe("GET");
+    expect(init?.headers).toEqual({
+      Authorization: "Bearer token-123",
+      "ChatGPT-Account-Id": "account-456",
+    });
+  });
+
+  test("maps auth failures", async () => {
+    mockFetch(async () => new Response(null, { status: 401 }));
+
+    const result = await fetchUsage("token", "account");
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe("auth");
+  });
+
+  test("maps rate limits", async () => {
+    mockFetch(async () => new Response(null, { status: 429 }));
+
+    const result = await fetchUsage("token", "account");
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe("rate_limited");
+  });
+
+  test("maps server errors", async () => {
+    mockFetch(async () => new Response(null, { status: 500 }));
+
+    const result = await fetchUsage("token", "account");
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe("server_error");
+  });
+
+  test("maps invalid successful payloads", async () => {
+    mockFetch(async () => Response.json({ unexpected: true }));
+
+    const result = await fetchUsage("token", "account");
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe("invalid_response");
+  });
+
+  test("maps network failures", async () => {
+    mockFetch(async () => {
+      throw new Error("offline");
+    });
+
+    const result = await fetchUsage("token", "account");
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe("network");
   });
 });

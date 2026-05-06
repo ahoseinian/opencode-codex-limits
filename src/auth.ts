@@ -67,7 +67,7 @@ export function parseAuthJson(raw: string): AuthResult {
   try {
     data = JSON.parse(raw);
   } catch {
-    return { ok: false, error: "auth_file_missing" };
+    return { ok: false, error: "invalid_auth_file" };
   }
 
   for (const key of PROVIDER_KEYS) {

@@ -12,10 +12,9 @@ export type AuthResult =
 
 export type AuthError =
   | "auth_file_missing"
+  | "invalid_auth_file"
   | "no_openai_auth"
-  | "no_access_token"
-  | "token_expired"
-  | "invalid_token";
+  | "token_expired";
 
 export type QuotaWindow = {
   label: string;

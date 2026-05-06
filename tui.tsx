@@ -22,14 +22,12 @@ function authErrorMessage(error: string): string {
   switch (error) {
     case "auth_file_missing":
       return "No auth file. Run 'opencode auth login'.";
+    case "invalid_auth_file":
+      return "Invalid auth file. Re-authenticate.";
     case "no_openai_auth":
       return "No OpenAI auth. Run 'opencode auth login' with ChatGPT Plus/Pro.";
-    case "no_access_token":
-      return "Missing access token. Re-authenticate.";
     case "token_expired":
       return "Token expired. Re-authenticate.";
-    case "invalid_token":
-      return "Invalid token. Re-authenticate.";
     default:
       return error;
   }
@@ -91,7 +89,7 @@ function CodexLimitsPanel(props: { theme: () => any }) {
   });
 
   return (
-    <box flexDirection="column" gap={1}>
+    <box flexDirection="column">
       <box flexDirection="row">
         <text>
           <b>Codex Limits</b>

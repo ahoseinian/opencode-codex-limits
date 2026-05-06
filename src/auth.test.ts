@@ -39,10 +39,10 @@ describe("parseAuthJson", () => {
     if (!result.ok) expect(result.error).toBe("no_openai_auth");
   });
 
-  test("returns auth_file_missing for invalid JSON", () => {
+  test("returns invalid_auth_file for invalid JSON", () => {
     const result = parseAuthJson("not valid json");
     expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error).toBe("auth_file_missing");
+    if (!result.ok) expect(result.error).toBe("invalid_auth_file");
   });
 
   test("skips entries with invalid JWT", () => {
