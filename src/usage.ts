@@ -36,20 +36,24 @@ function formatResetTime(seconds: number): string {
   return parts.join(" ");
 }
 
+function formatWindowLabel(seconds: number): string {
+  if (seconds === 604800) return "weekly";
+  if (seconds > 0 && seconds % 86400 === 0) return `${seconds / 86400}d`;
+  if (seconds > 0 && seconds % 3600 === 0) return `${seconds / 3600}h`;
+  return "usage";
+}
+
 export function parseUsageResponse(data: unknown): UsageResult {
   if (!isQuotaResponse(data)) {
     return { ok: false, error: "invalid_response" };
   }
 
-  const windows = [
-    { label: "5h", window: data.rate_limit.primary_window },
-    { label: "weekly", window: data.rate_limit.secondary_window },
-  ]
-    .filter(({ window: w }) => w !== null && w !== undefined)
-    .map(({ label, window: w }) => {
+  const windows = [data.rate_limit.primary_window, data.rate_limit.secondary_window]
+    .filter((w) => w !== null && w !== undefined)
+    .map((w) => {
       const window = w as WindowInfo;
       return {
-        label,
+        label: formatWindowLabel(window.limit_window_seconds),
         usedPercent: Math.min(100, Math.max(0, Math.round(window.used_percent))),
         resetText: formatResetTime(window.reset_after_seconds),
       };

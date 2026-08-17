@@ -63,6 +63,27 @@ describe("parseUsageResponse", () => {
     }
   });
 
+  test("labels a weekly-only primary window from its duration", () => {
+    const data = validResponse();
+    data.rate_limit.primary_window.limit_window_seconds = 604800;
+    (data.rate_limit as Record<string, unknown>).secondary_window = null;
+    const result = parseUsageResponse(data);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.windows).toHaveLength(1);
+      expect(result.windows[0].label).toBe("weekly");
+    }
+  });
+
+  test("uses a neutral label for an unknown window duration", () => {
+    const data = validResponse();
+    data.rate_limit.primary_window.limit_window_seconds = 123;
+    (data.rate_limit as Record<string, unknown>).secondary_window = null;
+    const result = parseUsageResponse(data);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.windows[0].label).toBe("usage");
+  });
+
   test("clamps used_percent to 0-100", () => {
     const data = validResponse();
     data.rate_limit.primary_window.used_percent = 150;

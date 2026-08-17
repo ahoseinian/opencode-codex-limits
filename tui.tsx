@@ -1,5 +1,6 @@
 /** @jsxImportSource @opentui/solid */
-import type { TuiPlugin, TuiPluginModule } from "@opencode-ai/plugin/tui";
+import { Plugin } from "@opencode-ai/plugin/tui";
+import type { ResolvedTheme } from "@opencode-ai/theme/tui";
 import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { readAuth } from "./src/auth";
 import { fetchUsage } from "./src/usage";
@@ -21,11 +22,11 @@ function progressBar(percent: number) {
 function authErrorMessage(error: string): string {
   switch (error) {
     case "auth_file_missing":
-      return "No auth file. Run 'opencode auth login'.";
+      return "No auth file. Run 'opencode2 auth login'.";
     case "invalid_auth_file":
       return "Invalid auth file. Re-authenticate.";
     case "no_openai_auth":
-      return "No OpenAI auth. Run 'opencode auth login' with ChatGPT Plus/Pro.";
+      return "No OpenAI auth. Run 'opencode2 auth login' with ChatGPT Plus/Pro.";
     case "token_expired":
       return "Token expired. Re-authenticate.";
     default:
@@ -60,7 +61,7 @@ async function loadQuota(): Promise<QuotaState> {
   return { tag: "data", plan: usage.plan, windows: usage.windows };
 }
 
-function CodexLimitsPanel(props: { theme: () => any }) {
+function CodexLimitsPanel(props: { theme: ResolvedTheme }) {
   const [quota, setQuota] = createSignal<QuotaState>({ tag: "loading" });
   const [stale, setStale] = createSignal(false);
   let interval: ReturnType<typeof setInterval> | null = null;
@@ -95,16 +96,16 @@ function CodexLimitsPanel(props: { theme: () => any }) {
           <b>Codex Limits</b>
         </text>
         <Show when={stale()}>
-          <text fg={props.theme().textMuted}> (stale)</text>
+          <text fg={props.theme.text.subdued}> (stale)</text>
         </Show>
       </box>
 
       <Show when={quota().tag === "loading"}>
-        <text fg={props.theme().textMuted}>loading...</text>
+        <text fg={props.theme.text.subdued}>loading...</text>
       </Show>
 
       <Show when={quota().tag === "error"}>
-        <text fg={props.theme().error}>
+        <text fg={props.theme.text.feedback.error.default}>
           {(quota() as { tag: "error"; message: string }).message}
         </text>
       </Show>
@@ -116,7 +117,7 @@ function CodexLimitsPanel(props: { theme: () => any }) {
             const remaining_text = String(remaining_percent).padStart(3, " ") + "%";
 
             return (
-              <text fg={props.theme().text}>
+              <text fg={props.theme.text.default}>
                 {remaining_text} {progressBar(remaining_percent)} {window.label.padEnd(6, " ")}{" "}
                 {"\u21bb"} {window.resetText}
               </text>
@@ -128,20 +129,16 @@ function CodexLimitsPanel(props: { theme: () => any }) {
   );
 }
 
-const tui: TuiPlugin = async (api) => {
-  api.slots.register({
-    order: 160,
-    slots: {
-      sidebar_content() {
-        return <CodexLimitsPanel theme={() => api.theme.current} />;
-      },
-    },
-  });
-};
-
-const plugin: TuiPluginModule & { id: string } = {
+const plugin = Plugin.define({
   id,
-  tui,
-};
+  setup(ctx) {
+    return ctx.ui.slot({
+      append: "sidebar.content",
+      render() {
+        return <CodexLimitsPanel theme={ctx.theme} />;
+      },
+    });
+  },
+});
 
 export default plugin;
