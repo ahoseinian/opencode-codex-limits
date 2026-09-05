@@ -1,6 +1,6 @@
 {
   "name": "opencode-codex-limits",
-  "version": "0.2.0-beta.1",
+  "version": "0.2.0-beta.2",
   "description": "OpenCode plugin that shows ChatGPT/Codex usage quota in the sidebar",
   "license": "MIT",
   "repository": {
@@ -13,13 +13,16 @@
     "LICENSE"
   ],
   "type": "module",
-  "main": "./dist/tui.js",
+  "main": "./dist/index.js",
   "exports": {
     ".": {
-      "import": "./dist/tui.js"
+      "import": "./dist/index.js"
     },
     "./tui": {
       "import": "./dist/tui.js"
+    },
+    "./rpc": {
+      "import": "./dist/src/rpc.js"
     }
   },
   "scripts": {
@@ -33,15 +36,21 @@
     "format:check": "oxfmt --check"
   },
   "dependencies": {
-    "@opencode-ai/plugin": "0.0.0-beta-17519",
-    "@opentui/solid": "0.5.3",
-    "solid-js": "1.9.12"
+    "@opencode-ai/plugin": "0.0.0-beta-19086"
   },
   "devDependencies": {
-    "@opencode-ai/theme": "0.0.0-beta-17519",
+    "@opencode-ai/theme": "0.0.0-beta-19086",
+    "@opentui/core": "0.5.10",
+    "@opentui/solid": "0.5.10",
     "@types/bun": "latest",
     "oxfmt": "latest",
     "oxlint": "latest",
+    "solid-js": "1.9.12",
     "typescript": "latest"
+  },
+  "peerDependencies": {
+    "@opentui/core": ">=0.5.10",
+    "@opentui/solid": ">=0.5.10",
+    "solid-js": ">=1.9.0"
   }
 }

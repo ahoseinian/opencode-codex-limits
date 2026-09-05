@@ -40,7 +40,7 @@ type JwtClaims = {
   "https://api.openai.com/profile"?: { email?: string };
 };
 
-function parseJwt(token: string): { accountId: string; email: string } | null {
+export function parseJwt(token: string): { accountId: string; email: string } | null {
   try {
     const parts = token.split(".");
     if (parts.length !== 3) return null;
@@ -62,6 +62,13 @@ type AuthEntry = {
 
 const PROVIDER_KEYS = ["openai"] as const;
 
+function isExpired(expires: number): boolean {
+  // OpenCode stores OAuth expiry timestamps in milliseconds. Accept seconds as
+  // well for compatibility with older or externally supplied auth files.
+  const expiresMs = expires < 1_000_000_000_000 ? expires * 1000 : expires;
+  return expiresMs < Date.now();
+}
+
 export function parseAuthJson(raw: string): AuthResult {
   let data: Record<string, unknown>;
   try {
@@ -79,7 +86,7 @@ export function parseAuthJson(raw: string): AuthResult {
     const access = entry.access;
     if (!access || access.trim() === "") continue;
 
-    if (typeof entry.expires === "number" && entry.expires < Math.floor(Date.now() / 1000)) {
+    if (typeof entry.expires === "number" && isExpired(entry.expires)) {
       return { ok: false, error: "token_expired" };
     }
 

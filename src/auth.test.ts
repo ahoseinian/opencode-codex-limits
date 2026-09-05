@@ -33,6 +33,18 @@ describe("parseAuthJson", () => {
     if (!result.ok) expect(result.error).toBe("token_expired");
   });
 
+  test("returns token_expired for a millisecond timestamp in the past", () => {
+    const json = authJson({ expires: Date.now() - 1000 });
+    const result = parseAuthJson(json);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBe("token_expired");
+  });
+
+  test("accepts a millisecond timestamp in the future", () => {
+    const json = authJson({ expires: Date.now() + 3600_000 });
+    expect(parseAuthJson(json).ok).toBe(true);
+  });
+
   test("returns no_openai_auth for empty JSON object", () => {
     const result = parseAuthJson("{}");
     expect(result.ok).toBe(false);

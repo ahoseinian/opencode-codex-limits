@@ -4,17 +4,20 @@ OpenCode TUI plugin that shows ChatGPT/Codex usage quota in the sidebar.
 
 ## OpenCode 2
 
-Install the beta package, then add it to the global `~/.config/opencode/cli.json` file:
+Install the beta package, then add it to the global `~/.config/opencode/opencode.json` file:
 
 ```json
 {
+  "$schema": "https://opencode.ai/config.json",
   "plugins": ["opencode-codex-limits@beta"]
 }
 ```
 
-For local development, use the absolute path to this package instead of the npm specifier. OpenCode 2 resolves relative paths from `cli.json`, not from the current project.
+The package includes a server plugin and a TUI plugin. The server plugin securely resolves OpenCode's active OpenAI credential and exposes only quota data to the sidebar. Do not add the package to `cli.json`; a terminal-only plugin cannot access service-managed credentials.
 
-OpenCode 2 is currently in beta, so this package's beta releases target a specific OpenCode 2 beta. The current release targets `opencode2 v0.0.0-beta-17519`.
+For local development, use the absolute path to this package directory instead of the npm specifier. OpenCode expects configured local plugins to be directories, not paths to individual JavaScript files.
+
+OpenCode 2 is currently in beta, so this package's beta releases target a specific OpenCode 2 beta. The current release targets `opencode2 v0.0.0-beta-19086`.
 
 ## OpenCode 1
 
@@ -29,9 +32,7 @@ OpenCode 1 requires the `0.1.x` compatibility line. Install `opencode-codex-limi
 
 Do not add this plugin to `opencode.json`; it is a terminal client plugin, not a server plugin.
 
-The plugin reads the shared OpenCode auth file created by `opencode2 auth login` or `opencode auth login` and displays remaining quota for the available usage windows.
-
-Set `OPENCODE_AUTH_PATH` to point at a specific auth file when testing or using a non-standard OpenCode data directory.
+The V2 plugin uses OpenCode's active service-managed credential. The V1 compatibility release reads the shared auth file created by `opencode auth login` and displays remaining quota for the available usage windows.
 
 ## Development
 

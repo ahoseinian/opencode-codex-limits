@@ -2,9 +2,8 @@
 import { Plugin } from "@opencode-ai/plugin/tui";
 import type { ResolvedTheme } from "@opencode-ai/theme/tui";
 import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
-import { readAuth } from "./src/auth";
-import { fetchUsage } from "./src/usage";
-import type { QuotaState, QuotaWindow } from "./src/types";
+import { CodexLimitsRpc } from "./src/rpc";
+import type { QuotaResult, QuotaState, QuotaWindow } from "./src/types";
 
 const id = "opencode-codex-limits";
 const REFRESH_MS = 120_000; // 2 minutes
@@ -19,23 +18,14 @@ function progressBar(percent: number) {
   return `${"█".repeat(filled)}${"░".repeat(width - filled)}`;
 }
 
-function authErrorMessage(error: string): string {
+function quotaErrorMessage(error: string): string {
   switch (error) {
-    case "auth_file_missing":
-      return "No auth file. Run 'opencode2 auth login'.";
-    case "invalid_auth_file":
-      return "Invalid auth file. Re-authenticate.";
     case "no_openai_auth":
       return "No OpenAI auth. Run 'opencode2 auth login' with ChatGPT Plus/Pro.";
-    case "token_expired":
-      return "Token expired. Re-authenticate.";
-    default:
-      return error;
-  }
-}
-
-function usageErrorMessage(error: string): string {
-  switch (error) {
+    case "unsupported_auth":
+      return "Codex usage requires ChatGPT Plus/Pro OAuth.";
+    case "invalid_token":
+      return "OpenAI credential has an unexpected format.";
     case "network":
       return "Network error. Check connection.";
     case "auth":
@@ -51,23 +41,28 @@ function usageErrorMessage(error: string): string {
   }
 }
 
-async function loadQuota(): Promise<QuotaState> {
-  const auth = readAuth();
-  if (!auth.ok) return { tag: "error", message: authErrorMessage(auth.error) };
-
-  const usage = await fetchUsage(auth.token, auth.accountId);
-  if (!usage.ok) return { tag: "error", message: usageErrorMessage(usage.error) };
+async function loadQuota(fetchQuota: () => Promise<QuotaResult>): Promise<QuotaState> {
+  let usage: QuotaResult;
+  try {
+    usage = await fetchQuota();
+  } catch {
+    return {
+      tag: "error",
+      message: "Server plugin unavailable. Add opencode-codex-limits to opencode.json.",
+    };
+  }
+  if (!usage.ok) return { tag: "error", message: quotaErrorMessage(usage.error) };
 
   return { tag: "data", plan: usage.plan, windows: usage.windows };
 }
 
-function CodexLimitsPanel(props: { theme: ResolvedTheme }) {
+function CodexLimitsPanel(props: { theme: ResolvedTheme; fetchQuota: () => Promise<QuotaResult> }) {
   const [quota, setQuota] = createSignal<QuotaState>({ tag: "loading" });
   const [stale, setStale] = createSignal(false);
   let interval: ReturnType<typeof setInterval> | null = null;
 
   const refresh = async () => {
-    const result = await loadQuota();
+    const result = await loadQuota(props.fetchQuota);
     if (result.tag === "error") {
       const current = quota();
       if (current.tag === "data") {
@@ -132,10 +127,16 @@ function CodexLimitsPanel(props: { theme: ResolvedTheme }) {
 const plugin = Plugin.define({
   id,
   setup(ctx) {
+    const rpc = ctx.client.rpc(CodexLimitsRpc);
     return ctx.ui.slot({
       append: "sidebar.content",
       render() {
-        return <CodexLimitsPanel theme={ctx.theme} />;
+        return (
+          <CodexLimitsPanel
+            theme={ctx.theme}
+            fetchQuota={() => rpc.usage({}) as Promise<QuotaResult>}
+          />
+        );
       },
     });
   },

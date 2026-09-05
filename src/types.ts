@@ -35,6 +35,15 @@ export type UsageResult =
 
 export type UsageError = "network" | "auth" | "rate_limited" | "invalid_response" | "server_error";
 
+export type QuotaError = UsageError | "no_openai_auth" | "unsupported_auth" | "invalid_token";
+
+export type QuotaResult =
+  | Extract<UsageResult, { ok: true }>
+  | {
+      ok: false;
+      error: QuotaError;
+    };
+
 export type QuotaState =
   | { tag: "loading" }
   | { tag: "error"; message: string }
