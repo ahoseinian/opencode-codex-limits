@@ -4,12 +4,12 @@ OpenCode TUI plugin that shows ChatGPT/Codex usage quota in the sidebar.
 
 ## OpenCode 2
 
-Install the beta package, then add it to the global `~/.config/opencode/opencode.json` file:
+Add the package to the global `~/.config/opencode/opencode.json` file:
 
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugins": ["opencode-codex-limits@beta"]
+  "plugins": ["opencode-codex-limits@latest"]
 }
 ```
 
@@ -17,7 +17,7 @@ The package includes a server plugin and a TUI plugin. The server plugin securel
 
 For local development, use the absolute path to this package directory instead of the npm specifier. OpenCode expects configured local plugins to be directories, not paths to individual JavaScript files.
 
-OpenCode 2 is currently in beta, so this package's beta releases target a specific OpenCode 2 beta. The current release targets `opencode2 v0.0.0-beta-19086`.
+The current code targets OpenCode `v2.0.27` and the matching `@opencode/plugin` SDK. OpenCode provides the plugin SDK and Effect runtime when loading plugins; older `@opencode-ai/plugin` beta SDKs are not compatible with this runtime.
 
 ## OpenCode 1
 

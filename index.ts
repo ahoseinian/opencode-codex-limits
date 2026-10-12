@@ -1,4 +1,4 @@
-import { Plugin } from "@opencode-ai/plugin";
+import { Plugin } from "@opencode/plugin";
 import { parseJwt } from "./src/auth";
 import { CodexLimitsRpc } from "./src/rpc";
 import type { QuotaResult } from "./src/types";

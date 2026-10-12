@@ -4,7 +4,7 @@ const result = await Bun.build({
   entrypoints: ["./index.ts", "./tui.tsx", "./src/rpc.ts"],
   outdir: "./dist",
   target: "bun",
-  external: ["@opencode-ai/plugin", "@opentui/solid", "solid-js"],
+  external: ["@opencode/plugin", "effect", "@opentui/core", "@opentui/solid", "solid-js"],
   plugins: [solidPlugin],
 });
 

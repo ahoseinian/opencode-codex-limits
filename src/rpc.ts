@@ -1,4 +1,4 @@
-import { Rpc } from "@opencode-ai/plugin";
+import { Rpc } from "@opencode/plugin/rpc";
 
 export const CodexLimitsRpc = Rpc.define({
   id: "opencode-codex-limits",

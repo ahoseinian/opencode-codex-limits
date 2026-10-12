@@ -1,6 +1,6 @@
 /** @jsxImportSource @opentui/solid */
-import { Plugin } from "@opencode-ai/plugin/tui";
-import type { ResolvedTheme } from "@opencode-ai/theme/tui";
+import { Plugin } from "@opencode/plugin/tui";
+import type { ResolvedTheme } from "@opencode/theme/tui";
 import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { CodexLimitsRpc } from "./src/rpc";
 import type { QuotaResult, QuotaState, QuotaWindow } from "./src/types";
@@ -21,7 +21,7 @@ function progressBar(percent: number) {
 function quotaErrorMessage(error: string): string {
   switch (error) {
     case "no_openai_auth":
-      return "No OpenAI auth. Run 'opencode2 auth login' with ChatGPT Plus/Pro.";
+      return "No OpenAI auth. Sign in to OpenAI with ChatGPT Plus/Pro in OpenCode.";
     case "unsupported_auth":
       return "Codex usage requires ChatGPT Plus/Pro OAuth.";
     case "invalid_token":
@@ -91,16 +91,16 @@ function CodexLimitsPanel(props: { theme: ResolvedTheme; fetchQuota: () => Promi
           <b>Codex Limits</b>
         </text>
         <Show when={stale()}>
-          <text fg={props.theme.text.subdued}> (stale)</text>
+          <text fg={props.theme.text.muted}> (stale)</text>
         </Show>
       </box>
 
       <Show when={quota().tag === "loading"}>
-        <text fg={props.theme.text.subdued}>loading...</text>
+        <text fg={props.theme.text.muted}>loading...</text>
       </Show>
 
       <Show when={quota().tag === "error"}>
-        <text fg={props.theme.text.feedback.error.default}>
+        <text fg={props.theme.text.feedback.error.base}>
           {(quota() as { tag: "error"; message: string }).message}
         </text>
       </Show>
@@ -112,7 +112,7 @@ function CodexLimitsPanel(props: { theme: ResolvedTheme; fetchQuota: () => Promi
             const remaining_text = String(remaining_percent).padStart(3, " ") + "%";
 
             return (
-              <text fg={props.theme.text.default}>
+              <text fg={props.theme.text.base}>
                 {remaining_text} {progressBar(remaining_percent)} {window.label.padEnd(6, " ")}{" "}
                 {"\u21bb"} {window.resetText}
               </text>
